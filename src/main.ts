@@ -2,6 +2,7 @@ import './style.css'
 import 'phaser';
 import { MenuScene } from './menu-scene';
 import { DigScene }  from './dig-scene';
+import { globalDebug } from './utils';
 
 const GameConfig: Phaser.Types.Core.GameConfig = {
   title: 'Where is Bob',
@@ -11,7 +12,10 @@ const GameConfig: Phaser.Types.Core.GameConfig = {
   height: 600,
   type: Phaser.AUTO,
   parent: 'app',
-  scene: [MenuScene, DigScene],
+  scene: [
+    DigScene,
+    MenuScene,
+  ],
   input: {
     keyboard: true
   },
@@ -19,7 +23,7 @@ const GameConfig: Phaser.Types.Core.GameConfig = {
     default: 'arcade',
     arcade: {
       gravity: { y: 0 },
-      debug: true,
+      debug: globalDebug,
     }
   },
   backgroundColor: '#000000',

@@ -8,7 +8,7 @@ export default class Player extends Phaser.Physics.Arcade.Image {
   keys: any;
   isAlive = false;
   target = new Phaser.Math.Vector2();
-  speed = 300;
+  speed = 100;
   // scene: Phaser.Scene;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
