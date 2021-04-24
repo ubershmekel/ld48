@@ -2,11 +2,16 @@ import 'phaser';
 import particleUrl from '../assets/images/particle-poop-gas.png';
 import soundUrl from '../assets/audio/test.mp3';
 import tileMapUrl from '../assets/images/tilemap.png';
+import flyUrl from '../assets/images/fly.png';
 import tileMapDataUrl from '../assets/images/bob-map.json';
+import Player from './player';
 
 export class MenuScene extends Phaser.Scene {
   private startKey!: Phaser.Input.Keyboard.Key;
   private sprites: { s: Phaser.GameObjects.Image, r: number }[] = [];
+  private marker!: Phaser.GameObjects.Graphics;
+  private groundLayer!: Phaser.Tilemaps.TilemapLayer;
+  private player!: Player;
 
   constructor() {
     super({
@@ -23,6 +28,7 @@ export class MenuScene extends Phaser.Scene {
     this.load.audio('overture', soundUrl);
 
     this.load.image("tiles", tileMapUrl);
+    this.load.image("fly", flyUrl);
     this.load.tilemapTiledJSON('map', tileMapDataUrl);
 
   }
@@ -31,7 +37,7 @@ export class MenuScene extends Phaser.Scene {
     const map = this.make.tilemap({ key: "map" });
     // `addTilesetImage` tells phaser where the image is for this tile map
     const tiles = map.addTilesetImage("bob-the-ant", "tiles");
-    map.createLayer("Tile Layer 1", tiles);
+    this.groundLayer = map.createLayer("Tile Layer 1", tiles);
     // Limit the camera to the map size
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
@@ -42,24 +48,31 @@ export class MenuScene extends Phaser.Scene {
 
     this.add.image(100, 100, 'particle');
 
-    for (let i = 0; i < 300; i++) {
-      const x = Phaser.Math.Between(-64, 800);
-      const y = Phaser.Math.Between(-64, 600);
+    // for (let i = 0; i < 300; i++) {
+    //   const x = Phaser.Math.Between(-64, 800);
+    //   const y = Phaser.Math.Between(-64, 600);
 
-      const image = this.add.image(x, y, 'particle');
-      image.setBlendMode(Phaser.BlendModes.MULTIPLY);
-      this.sprites.push({ s: image, r: 2 + Math.random() * 6 });
-    }
+    //   const image = this.add.image(x, y, 'particle');
+    //   image.setBlendMode(Phaser.BlendModes.NORMAL);
+    //   this.sprites.push({ s: image, r: 2 + Math.random() * 6 });
+    // }
 
-    this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+    this.input.once('pointerup', (pointer: Phaser.Input.Pointer) => {
       var touchX = pointer.x;
       var touchY = pointer.y;
       // ...
-      this.sound.add('overture', { loop: false }).play();
-      this.scene.start(this);
-
+      // this.sound.add('overture', { loop: false }).play();
+      // this.scene.start(this);
+      this.player.start();
     });
   
+    this.marker = this.add.graphics();
+    this.marker.lineStyle(5, 0xffffff, 1);
+    this.marker.strokeRect(0, 0, map.tileWidth, map.tileHeight);
+    this.marker.lineStyle(3, 0xff4f78, 1);
+    this.marker.strokeRect(0, 0, map.tileWidth, map.tileHeight);
+
+    this.player = new Player(this, 400, 400);
   }
 
   update(): void {
@@ -69,13 +82,18 @@ export class MenuScene extends Phaser.Scene {
 
     for (let i = 0; i < this.sprites.length; i++) {
       const sprite = this.sprites[i].s;
-
       sprite.y -= this.sprites[i].r;
-
       if (sprite.y < -256) {
         sprite.y = 700;
       }
     }
+
+    // Show debug pointer
+    const pointer = this.input.activePointer;
+    const worldPoint = pointer.positionToCamera(this.cameras.main);
+    const pointerTileXY = this.groundLayer.worldToTileXY(worldPoint.x, worldPoint.y);
+    const snappedWorldPoint = this.groundLayer.tileToWorldXY(pointerTileXY.x, pointerTileXY.y);
+    this.marker.setPosition(snappedWorldPoint.x, snappedWorldPoint.y);  
 
   }
 }
