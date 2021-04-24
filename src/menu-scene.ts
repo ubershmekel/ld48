@@ -3,6 +3,7 @@ import particleUrl from '../assets/images/particle-poop-gas.png';
 import soundUrl from '../assets/audio/test.mp3';
 import tileMapUrl from '../assets/images/tilemap.png';
 import flyUrl from '../assets/images/fly.png';
+import antTopUrl from '../assets/images/ant-top.png';
 import tileMapDataUrl from '../assets/images/bob-map.json';
 import Player from './player';
 
@@ -29,6 +30,7 @@ export class MenuScene extends Phaser.Scene {
 
     this.load.image("tiles", tileMapUrl);
     this.load.image("fly", flyUrl);
+    this.load.image("ant-top", antTopUrl);
     this.load.tilemapTiledJSON('map', tileMapDataUrl);
 
   }
@@ -38,8 +40,9 @@ export class MenuScene extends Phaser.Scene {
     // `addTilesetImage` tells phaser where the image is for this tile map
     const tiles = map.addTilesetImage("bob-the-ant", "tiles");
     this.groundLayer = map.createLayer("Tile Layer 1", tiles);
+
     // Limit the camera to the map size
-    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    // this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
     this.add.text(0, 0, 'Press S to restart scene', {
       fontSize: '60px',
@@ -76,6 +79,8 @@ export class MenuScene extends Phaser.Scene {
   }
 
   update(): void {
+    this.cameras.main.startFollow(this.player);
+
     if (this.startKey.isDown) {
       this.scene.start(this);
     }

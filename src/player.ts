@@ -13,7 +13,8 @@
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     // super(scene, x, y, 'assets', 'player');
-    super(scene, x, y, 'fly');
+    super(scene, x, y, 'ant-top');
+    this.setScale(0.2);
     scene.add.existing(this);
     scene.physics.add.existing(this);
     
@@ -71,7 +72,7 @@
               this.target.y = pointer.y;
               
               //  Add 90 degrees because the sprite is drawn facing up
-              this.rotation = this.scene.physics.moveToObject(this, this.target, this.speed) + 1.5707963267948966;
+              this.rotation = this.scene.physics.moveToObject(this, this.target, this.speed) + Math.PI / 2;
           }
       });
   }
