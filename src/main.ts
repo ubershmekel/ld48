@@ -1,6 +1,7 @@
 import './style.css'
 import 'phaser';
 import { MenuScene } from './menu-scene';
+import { DigScene }  from './dig-scene';
 
 const GameConfig: Phaser.Types.Core.GameConfig = {
   title: 'Tank',
@@ -10,7 +11,7 @@ const GameConfig: Phaser.Types.Core.GameConfig = {
   height: 600,
   type: Phaser.AUTO,
   parent: 'app',
-  scene: [MenuScene],
+  scene: [MenuScene, DigScene],
   input: {
     keyboard: true
   },

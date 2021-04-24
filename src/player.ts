@@ -4,7 +4,7 @@
  * method when you're done with the player.
  */
 
- export default class Player extends Phaser.Physics.Arcade.Image {
+export default class Player extends Phaser.Physics.Arcade.Image {
   keys: any;
   isAlive = false;
   target = new Phaser.Math.Vector2();
@@ -17,9 +17,9 @@
     this.setScale(0.2);
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    
+
     // this.scene = scene;
-  
+
     // Create the animations we need from the player spritesheet
     // const anims = scene.anims;
     // anims.create({
@@ -61,20 +61,20 @@
     });
   }
 
-  start () {
-      this.isAlive = true;
+  start() {
+    this.isAlive = true;
+    this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      const preRotation = this.rotation;
+      if (this.isAlive) {
+        this.target.x = pointer.x;
+        this.target.y = pointer.y;
 
-      this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) =>
-      {
-          if (this.isAlive)
-          {
-              this.target.x = pointer.x;
-              this.target.y = pointer.y;
-              
-              //  Add 90 degrees because the sprite is drawn facing up
-              this.rotation = this.scene.physics.moveToObject(this, this.target, this.speed) + Math.PI / 2;
-          }
-      });
+        //  Add 90 degrees because the sprite is drawn facing up
+        this.rotation = this.scene.physics.moveToObject(this, this.target, this.speed) + Math.PI / 2;
+        console.log('target', this.target, preRotation, this.rotation, this.scene.physics.world.bounds);
+
+      }
+    });
   }
 
   // update(time: sec, deltaMs) {
