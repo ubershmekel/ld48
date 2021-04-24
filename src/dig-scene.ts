@@ -35,12 +35,23 @@ export class DigScene extends Phaser.Scene {
 
   }
 
-  create(): void {
+  createMap() {
     const map = this.make.tilemap({ key: "map" });
     // `addTilesetImage` tells phaser where the image is for this tile map
     const tiles = map.addTilesetImage("bob-the-ant", "tiles");
     this.groundLayer = map.createLayer("Tile Layer 1", tiles);
+    this.marker = this.add.graphics();
+    this.marker.lineStyle(5, 0xffffff, 1);
+    this.marker.strokeRect(0, 0, map.tileWidth, map.tileHeight);
+    this.marker.lineStyle(3, 0xff4f78, 1);
+    this.marker.strokeRect(0, 0, map.tileWidth, map.tileHeight);
+  }
 
+  create(): void {
+    // createMap();
+
+    // this.physics.world.setBounds(0, 0, 1e4, 1e4);
+    console.log("world", this.physics.world.bounds);
     // Limit the camera to the map size
     // this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
@@ -70,11 +81,9 @@ export class DigScene extends Phaser.Scene {
       this.player.start();
     });
   
-    this.marker = this.add.graphics();
-    this.marker.lineStyle(5, 0xffffff, 1);
-    this.marker.strokeRect(0, 0, map.tileWidth, map.tileHeight);
-    this.marker.lineStyle(3, 0xff4f78, 1);
-    this.marker.strokeRect(0, 0, map.tileWidth, map.tileHeight);
+    this.add.graphics()
+      .lineStyle(3, 0xdddd78, 1)
+      .strokeRect(0, 0, this.physics.world.bounds.width, this.physics.world.bounds.height);
 
     this.player = new Player(this, 400, 400);
   }
@@ -95,11 +104,12 @@ export class DigScene extends Phaser.Scene {
     }
 
     // Show debug pointer
-    const pointer = this.input.activePointer;
-    const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
-    const pointerTileXY = this.groundLayer.worldToTileXY(worldPoint.x, worldPoint.y);
-    const snappedWorldPoint = this.groundLayer.tileToWorldXY(pointerTileXY.x, pointerTileXY.y);
-    this.marker.setPosition(snappedWorldPoint.x, snappedWorldPoint.y);  
-
+    if (this.marker) {
+      const pointer = this.input.activePointer;
+      const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
+      const pointerTileXY = this.groundLayer.worldToTileXY(worldPoint.x, worldPoint.y);
+      const snappedWorldPoint = this.groundLayer.tileToWorldXY(pointerTileXY.x, pointerTileXY.y);
+      this.marker.setPosition(snappedWorldPoint.x, snappedWorldPoint.y);  
+    }
   }
 }

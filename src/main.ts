@@ -4,8 +4,8 @@ import { MenuScene } from './menu-scene';
 import { DigScene }  from './dig-scene';
 
 const GameConfig: Phaser.Types.Core.GameConfig = {
-  title: 'Tank',
-  url: 'https://github.com/digitsensitive/phaser3-typescript',
+  title: 'Where is Bob',
+  url: 'https://yuvalg.com',
   version: '2.0',
   width: 800,
   height: 600,
@@ -19,7 +19,7 @@ const GameConfig: Phaser.Types.Core.GameConfig = {
     default: 'arcade',
     arcade: {
       gravity: { y: 0 },
-      debug: false
+      debug: true,
     }
   },
   backgroundColor: '#000000',
