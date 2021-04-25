@@ -10,11 +10,13 @@ import Player from './player';
 import { getRandomArbitrary, getRandomInt, globalDebug } from './utils';
 
 const brownColors = [
-  0x553120,
+  0x513015,
+  0x553120, // brownest?
+  0x583325,
   0x6c4316,
-  0x783524,
-  0x81581a,
-  0x93613a,
+  // 0x783524,
+  // 0x81581a,
+  // 0x93613a,
 ];
 
 function randomBrown() {

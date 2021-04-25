@@ -1,4 +1,3 @@
-import './style.css'
 import 'phaser';
 import { MenuScene } from './menu-scene';
 import { DigScene }  from './dig-scene';
@@ -31,6 +30,10 @@ const GameConfig: Phaser.Types.Core.GameConfig = {
   audio: {
     // `disableWebAudio: false` is for ios audio
     disableWebAudio: false,
+  },
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
   },
 };
 
