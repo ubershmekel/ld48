@@ -36,11 +36,13 @@ export class DigScene extends Phaser.Scene {
   private groundLayer!: Phaser.Tilemaps.TilemapLayer;
   private player!: Player;
   private level = 1;
-  private timeElapsedMs = 0;
+  private lastDistanceUpdateTime = 0;
   private instructions!: Phaser.GameObjects.Text;
   private bobTarget!: Phaser.GameObjects.Image;
   private startDistance = 1e9;
   private dialog!: DialogBox;
+  private helpTipSeen = false;
+  private distanceUpdatesCount = 0;
 
   constructor() {
     super({
@@ -50,6 +52,7 @@ export class DigScene extends Phaser.Scene {
 
   init(props: any) {
     this.level = props.level || 1;
+    this.distanceUpdatesCount = 0;
   }
 
   preload(): void {
@@ -260,6 +263,7 @@ export class DigScene extends Phaser.Scene {
     // Note we must initialize the player before the poop because
     // we need the player during poop calculations.
     this.player.depth = 2;
+    this.cameras.main.startFollow(this.player);
   }
 
   start() {
@@ -270,21 +274,35 @@ export class DigScene extends Phaser.Scene {
   }
 
   giveDistanceUpdate() {
+    this.distanceUpdatesCount += 1;
+    this.lastDistanceUpdateTime = new Date().getTime();
     const dist = Phaser.Math.Distance.BetweenPoints(this.player, this.bobTarget);
     const relativeToStart = dist / this.startDistance;
     playDistance(relativeToStart);
   }
 
-  update(_time: number, deltaMs: number): void {
+  maybeShowHelpDialog() {
+    const dist = Phaser.Math.Distance.BetweenPoints(this.player, this.bobTarget);
+    const notWinning = this.distanceUpdatesCount > 8 || dist > 1000;
+    if (notWinning && this.level < 8 && !this.helpTipSeen) {
+      console.log("You need some help");
+      this.dialog.setText("You're pretty far off... Go find Bob 🐜 in the poop 💩!");
+      this.dialog.show();
+      this.helpTipSeen = true;
+    }
+  }
+
+  update(): void {
+    this.maybeShowHelpDialog();
+
     const msBetweenChords = 3000;
     if (this.player.isAlive) {
-      this.timeElapsedMs += deltaMs;
-      if (this.timeElapsedMs > msBetweenChords) {
-        this.timeElapsedMs -= msBetweenChords;
+      const msSinceLastDistanceUpdate = new Date().getTime() - this.lastDistanceUpdateTime;
+      if (msSinceLastDistanceUpdate > msBetweenChords) {
+        this.lastDistanceUpdateTime = 0;
         this.giveDistanceUpdate();
       }
     }
-    this.cameras.main.startFollow(this.player);
 
     if (this.startKey.isDown) {
       this.scene.start(this);
