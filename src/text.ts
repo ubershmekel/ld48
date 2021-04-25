@@ -1,9 +1,9 @@
 
 
 export const storyLines = [
-  ['There you are, Bob!', 'Fewf, that was a close one.'],
-  ['What is it, do you like the smell?', "Nope, I just like the elephants."],
   ['Why do you keep getting in deeper and deeper sh-', "It's only game, why you heff to be mad?"],
+  ['I missed you Bob!', "I'm flushing, I mean, blushing 😊"],
+  ['What is it, do you like the smell?', "Nope, I just like the elephants."],
   ['Mom is going to be worried', 'Crap! We should go home.'],
   ["That's it! We're going home right now!", "Yeah, I'm all pooped out."],
   ["Is this game some sort of black comedy?", "More like brown comedy..."],
