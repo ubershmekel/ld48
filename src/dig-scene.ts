@@ -157,7 +157,9 @@ export class DigScene extends Phaser.Scene {
     const status = this.add.text(10, 10, 'Level ' + this.level, {
       fontSize: '30px',
       fontFamily: "Helvetica",
-    }).setScrollFactor(0);
+    });
+    // The status should not scroll when the camera moves
+    status.setScrollFactor(0);
 
     this.input.once('pointerup', (_pointer: Phaser.Input.Pointer) => {
       this.player.start();
