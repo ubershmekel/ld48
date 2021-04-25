@@ -6,6 +6,7 @@ import flyUrl from '../assets/images/fly.png';
 import antTopUrl from '../assets/images/ant-top.png';
 import tileMapDataUrl from '../assets/images/bob-map.json';
 import splashScreenUrl from '../assets/images/splashScreen.png';
+import { welcomeSound } from './sounds';
 
 export class MenuScene extends Phaser.Scene {
   private startKey!: Phaser.Input.Keyboard.Key;
@@ -63,6 +64,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   exitMenu() {
+    welcomeSound();
     this.scene.start('DigScene');
   }
 
