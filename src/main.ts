@@ -44,7 +44,15 @@ export class Game extends Phaser.Game {
   }
 }
 
+declare global {
+  // Avoid this error:
+  //   Property '_game' does not exist on type 'Window & typeof globalThis'.
+  // https://stackoverflow.com/questions/12709074/how-do-you-explicitly-set-a-new-property-on-window-in-typescript
+  interface Window {
+      _game: Phaser.Game;
+  }
+}
+
 window.addEventListener('load', () => {
-  const game = new Game(GameConfig);
-  console.log(game);
+  window._game = new Game(GameConfig);
 });
