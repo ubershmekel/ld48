@@ -4,7 +4,7 @@
  * method when you're done with the player.
  */
 
-export default class Player extends Phaser.Physics.Arcade.Image {
+export default class Player extends Phaser.Physics.Arcade.Sprite {
   keys: any;
   isAlive = false;
   target = new Phaser.Math.Vector2();
@@ -15,21 +15,27 @@ export default class Player extends Phaser.Physics.Arcade.Image {
   // scene: Phaser.Scene;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
+    // scene.physics.add.sprite
     // super(scene, x, y, 'assets', 'player');
-    super(scene, x, y, 'ant-top');
-    this.setScale(0.2);
+    // super(scene, x, y, 'ant-top');
+    // this.setScale(0.2);
+    super(scene, x, y, 'player', 0);
     scene.add.existing(this);
     scene.physics.add.existing(this);
-
+    
     this.lastX = x;
     this.lastY = y;
+
   }
 
   start() {
     this.isAlive = true;
   }
 
-  preUpdate() {
+  preUpdate(time: any, delta: any) {
+    // https://phaser.discourse.group/t/solved-animation-on-extends-sprites-class/3035
+    super.preUpdate(time, delta);
+
     this.distanceMoved += Phaser.Math.Distance.BetweenPoints(this, {x: this.lastX, y: this.lastY});
     this.lastX = this.x;
     this.lastY = this.y;

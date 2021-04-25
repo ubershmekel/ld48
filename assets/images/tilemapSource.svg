@@ -15,7 +15,7 @@
    version="1.1"
    id="svg895"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="tilemap-source.svg"
+   sodipodi:docname="tilemapSource.svg"
    inkscape:export-filename="D:\1stuff\dev\2021\ld48\assets\images\tilemap.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
@@ -28,9 +28,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="128.71724"
-     inkscape:cy="-7.756519"
+     inkscape:zoom="1.4"
+     inkscape:cx="149.03028"
+     inkscape:cy="587.22994"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -43,9 +43,9 @@
      inkscape:object-nodes="false"
      inkscape:bbox-paths="true"
      inkscape:bbox-nodes="true"
-     inkscape:window-width="1691"
+     inkscape:window-width="1689"
      inkscape:window-height="1057"
-     inkscape:window-x="221"
+     inkscape:window-x="223"
      inkscape:window-y="-8"
      inkscape:window-maximized="1">
     <inkscape:grid
@@ -73,7 +73,7 @@
      transform="translate(74.081498,16.127566)">
     <g
        id="g1577"
-       transform="matrix(0.48679509,0,0,0.48679509,-118.23426,77.292933)">
+       transform="matrix(0.48679509,0,0,0.48679509,-118.23426,-75.150068)">
       <path
          inkscape:connector-curvature="0"
          id="path4622-0-8"
@@ -155,7 +155,7 @@
     </g>
     <g
        id="g1577-5"
-       transform="matrix(-0.4867951,0,0,0.4867951,3.9379279,77.292932)">
+       transform="matrix(-0.4867951,0,0,0.4867951,3.9379291,-75.150069)">
       <path
          inkscape:connector-curvature="0"
          id="path4622-0-8-9"
@@ -237,7 +237,7 @@
     </g>
     <g
        id="g1577-5-3"
-       transform="matrix(0,0.4867951,0.4867951,0,-98.987373,92.162672)">
+       transform="matrix(0,0.4867951,0.4867951,0,-98.987371,-60.280329)">
       <path
          inkscape:connector-curvature="0"
          id="path4622-0-8-9-8"
@@ -319,7 +319,7 @@
     </g>
     <g
        id="g1577-5-32"
-       transform="matrix(0,-0.4867951,-0.4867951,0,52.574559,197.35853)">
+       transform="matrix(0,-0.4867951,-0.4867951,0,52.574561,44.915533)">
       <path
          inkscape:connector-curvature="0"
          id="path4622-0-8-9-3"
