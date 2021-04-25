@@ -11,6 +11,7 @@ import tileMapDataUrl from '../assets/images/bob-map.json';
 import Player from './player';
 import { getRandomArbitrary, getRandomInt, globalDebug } from './utils';
 import { playDistance } from './sounds';
+import { showDialog } from './dialog';
 
 const brownColors = [
   0x513015,
@@ -37,6 +38,7 @@ export class DigScene extends Phaser.Scene {
   private instructions!: Phaser.GameObjects.Text;
   private bobTarget!: Phaser.GameObjects.Image;
   private startDistance = 1e9;
+  private dialog!: any;
 
   constructor() {
     super({
@@ -162,6 +164,10 @@ export class DigScene extends Phaser.Scene {
 
   create(): void {
     this.createBackground();
+    if (this.level === 1) {
+      this.dialog = showDialog(this);
+      this.dialog.setText("I can't believe Bob got lost in the poop again. Luckily when I get closer to Bob, the piano plays a higher note.");
+    }
 
     // this.physics.world.setBounds(0, 0, 1e4, 1e4);
     // console.log("world", this.physics.world.bounds);
@@ -206,6 +212,7 @@ export class DigScene extends Phaser.Scene {
     this.player.start();
     this.instructions.setVisible(false);
     this.giveDistanceUpdate();
+    this.dialog.hide();
   }
 
   giveDistanceUpdate() {
