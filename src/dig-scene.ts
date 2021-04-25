@@ -77,7 +77,7 @@ export class DigScene extends Phaser.Scene {
     this.load.image("elephant", elephantUrl);
 
     this.load.spritesheet(
-      "player",
+      "sprite-sheet",
       tileMapUrl,
       {
         frameWidth: 64,
@@ -106,14 +106,20 @@ export class DigScene extends Phaser.Scene {
     const anims = this.anims;
     anims.create({
       key: "player-idle",
-      frames: anims.generateFrameNumbers("player", { start: 4, end: 7 }),
+      frames: anims.generateFrameNumbers("sprite-sheet", { start: 4, end: 7 }),
       frameRate: 3,
       repeat: -1
     });
     anims.create({
       key: "player-run",
-      frames: anims.generateFrameNumbers("player", { start: 8, end: 9 }),
+      frames: anims.generateFrameNumbers("sprite-sheet", { start: 8, end: 9 }),
       frameRate: 8,
+      repeat: -1
+    });
+    anims.create({
+      key: "bob-celebrate",
+      frames: anims.generateFrameNumbers("sprite-sheet", { start: 10, end: 13 }),
+      frameRate: 4,
       repeat: -1
     });
   }
@@ -229,7 +235,8 @@ export class DigScene extends Phaser.Scene {
     // bring the poop to the front
     poopImage.depth = 1;
 
-    const bob = this.add.image(poopImage.x, poopImage.y, 'foundBob');
+    const bob = this.add.sprite(poopImage.x, poopImage.y, 'bob', 0);
+    bob.anims.play("bob-celebrate", true);
     bob.alpha = 0;
     // `bob.depth` so Bob shows up above the poop and the player
     bob.depth = 3;
@@ -352,9 +359,11 @@ export class DigScene extends Phaser.Scene {
   }
 
   createTrailFollowPlayer() {
+    const trailSplotchCount = 20;
     this.trail = [];
     this.lastDistance = 0;
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < trailSplotchCount; i++) {
+      // -2000, -2000 to hide these trails initially
       const image = this.add.image(-2000, -2000, 'digTrail');
       image.scale = 0.5;
       image.setBlendMode(Phaser.BlendModes.MULTIPLY);

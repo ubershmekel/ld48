@@ -12,8 +12,8 @@ const GameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'app',
   scene: [
-    DigScene,
     MenuScene,
+    DigScene,
   ],
   input: {
     keyboard: true

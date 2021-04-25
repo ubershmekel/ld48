@@ -49,8 +49,8 @@ export class MenuScene extends Phaser.Scene {
 
     this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'splashScreen');
 
-    for (let i = 0; i < 100; i++) {
-      const x = Phaser.Math.Between(300, 600);
+    for (let i = 0; i < 30; i++) {
+      const x = Phaser.Math.Between(200, 400);
       const y = Phaser.Math.Between(-64, 600);
 
       const image = this.add.image(x, y, 'particle');
