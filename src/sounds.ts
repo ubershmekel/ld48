@@ -20,7 +20,7 @@ const chords = [
   'E2D3G3B4',
   'F2E3A3C4',
   'G2F3B3D4',
-  'C1E3G3C4',
+  'C3E3G3C4',
   // 'G1C3E3',
   // 'A1C3F3',
   // 'A2C4E4',
@@ -55,6 +55,23 @@ async function playNotes(notesStr: string, durationSeconds: number) {
   };
 
   return sleep(durationSeconds * 1000 + 100);
+}
+
+export async function playDistance(distance: number) {
+  // `distance` is 0.0 is closest
+  // 1.0 or greater is farther
+  if (distance > 0.99) {
+    // avoid out of bounds array index
+    distance = 0.99;
+  }
+  if (distance < 0.0) {
+    distance = 0.0;
+  }
+  // Math.floor(chords.length * distance) === [0, chords.length - 1]
+  // chordIndex === [0, chords.length - 1], but the larger the distance, the lower the index
+  const chordIndex = chords.length - Math.floor(chords.length * distance) - 1;
+
+  return playNotes(chords[chordIndex], noteDurationSeconds);
 }
 
 export async function welcomeSound() {

@@ -8,6 +8,7 @@ import antTopUrl from '../assets/images/ant-top.png';
 import tileMapDataUrl from '../assets/images/bob-map.json';
 import Player from './player';
 import { getRandomArbitrary, getRandomInt, globalDebug } from './utils';
+import { playDistance } from './sounds';
 
 const brownColors = [
   0x513015,
@@ -30,6 +31,10 @@ export class DigScene extends Phaser.Scene {
   private groundLayer!: Phaser.Tilemaps.TilemapLayer;
   private player!: Player;
   private level = 1;
+  private timeElapsedMs = 0;
+  private instructions!: Phaser.GameObjects.Text;
+  private bobTarget!: Phaser.GameObjects.Image;
+  private startDistance = 1e9;
 
   constructor() {
     super({
@@ -121,9 +126,11 @@ export class DigScene extends Phaser.Scene {
       // Can't have Bob hide right at the start.
       bobIndex = 1;
     }
-    console.log("physics overalp", this.player, poopImages[bobIndex]);
-    this.physics.add.existing(poopImages[bobIndex]);
-    this.physics.add.overlap(this.player, poopImages[bobIndex], this.foundBob, undefined, this);
+    this.bobTarget = poopImages[bobIndex];
+    this.startDistance = Phaser.Math.Distance.BetweenPoints(this.player, this.bobTarget);
+    console.log("physics overalp", this.player, this.bobTarget);
+    this.physics.add.existing(this.bobTarget);
+    this.physics.add.overlap(this.player, this.bobTarget, this.foundBob, undefined, this);
   }
 
   // foundBob(player: Player, poopImage: Phaser.GameObjects.Image) {
@@ -149,7 +156,7 @@ export class DigScene extends Phaser.Scene {
     this.add.image(100, 100, 'particle');
     this.generatePoopMap(this.level + 1);
 
-    const instructions = this.add.text(-100, 0, 'Tap/click to start', {
+    this.instructions = this.add.text(-100, 0, 'Tap/click to start', {
       fontSize: '60px',
       fontFamily: "Helvetica",
     });
@@ -162,8 +169,7 @@ export class DigScene extends Phaser.Scene {
     status.setScrollFactor(0);
 
     this.input.once('pointerup', (_pointer: Phaser.Input.Pointer) => {
-      this.player.start();
-      instructions.setVisible(false);
+      this.start();
     });
   
     if (globalDebug) {
@@ -176,7 +182,27 @@ export class DigScene extends Phaser.Scene {
     this.player.depth = 1;
   }
 
-  update(): void {
+  start() {
+    this.player.start();
+    this.instructions.setVisible(false);
+    this.giveDistanceUpdate();
+  }
+
+  giveDistanceUpdate() {
+    const dist = Phaser.Math.Distance.BetweenPoints(this.player, this.bobTarget);
+    const relativeToStart = dist / this.startDistance;
+    playDistance(relativeToStart);
+  }
+
+  update(_time: number, deltaMs: number): void {
+    const msBetweenChords = 3000;
+    if (this.player.isAlive) {
+      this.timeElapsedMs += deltaMs;
+      if (this.timeElapsedMs > msBetweenChords) {
+        this.timeElapsedMs -= msBetweenChords;
+        this.giveDistanceUpdate();
+      }
+    }
     this.cameras.main.startFollow(this.player);
 
     if (this.startKey.isDown) {
