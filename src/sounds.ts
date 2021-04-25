@@ -10,7 +10,7 @@ const reverb = new Tone.Reverb({
 const piano = new Piano({ velocities: 1 }).connect(reverb).toDestination();
 
 piano.load().then(() => {
-  console.log('loaded!')
+  console.log('piano loaded!')
 })
 
 // A1, B1, ..., G1, A2, ...

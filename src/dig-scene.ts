@@ -2,6 +2,8 @@ import 'phaser';
 import particleUrl from '../assets/images/particle-poop-gas.png';
 import soundUrl from '../assets/audio/test.mp3';
 import tileMapUrl from '../assets/images/tilemap.png';
+import groundUrl from '../assets/images/ground.png';
+import elephantUrl from '../assets/images/elephant.png';
 import flyUrl from '../assets/images/fly.png';
 import poopFalafelUrl from '../assets/images/poopFalafel.png';
 import antTopUrl from '../assets/images/ant-top.png';
@@ -59,6 +61,8 @@ export class DigScene extends Phaser.Scene {
     this.load.image("poopFalafel", poopFalafelUrl);
     this.load.image("ant-top", antTopUrl);
     this.load.tilemapTiledJSON('map', tileMapDataUrl);
+    this.load.image("ground", groundUrl);
+    this.load.image("elephant", elephantUrl);
 
   }
 
@@ -128,7 +132,6 @@ export class DigScene extends Phaser.Scene {
     }
     this.bobTarget = poopImages[bobIndex];
     this.startDistance = Phaser.Math.Distance.BetweenPoints(this.player, this.bobTarget);
-    console.log("physics overalp", this.player, this.bobTarget);
     this.physics.add.existing(this.bobTarget);
     this.physics.add.overlap(this.player, this.bobTarget, this.foundBob, undefined, this);
   }
@@ -143,18 +146,32 @@ export class DigScene extends Phaser.Scene {
     player.isAlive = false;
   }
 
-  create(): void {
+  createBackground() {
     // createMap();
+    this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor("#4499ee");
+
+    const ground = this.add.image(0, -90, "ground");
+    ground.setOrigin(0.5, 0);
+    ground.displayWidth = 4000;
+    ground.displayHeight = 600;
+
+    const elephant = this.add.image(-100, 0, "elephant");
+    elephant.setOrigin(1.0, 1.0);
+    elephant.scale = 2;
+  }
+
+  create(): void {
+    this.createBackground();
 
     // this.physics.world.setBounds(0, 0, 1e4, 1e4);
-    console.log("world", this.physics.world.bounds);
+    // console.log("world", this.physics.world.bounds);
     // Limit the camera to the map size
     // this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
     this.player = new Player(this, 0, 0);
 
     this.add.image(100, 100, 'particle');
-    this.generatePoopMap(this.level + 1);
+    this.generatePoopMap(this.level + 5);
 
     this.instructions = this.add.text(-100, 0, 'Tap/click to start', {
       fontSize: '60px',
@@ -179,6 +196,9 @@ export class DigScene extends Phaser.Scene {
         .strokeRect(0, 0, this.physics.world.bounds.width, this.physics.world.bounds.height);
     }
 
+    // Make sure the player is rendered above the poop.
+    // Note we must initialize the player before the poop because
+    // we need the player during poop calculations.
     this.player.depth = 1;
   }
 
