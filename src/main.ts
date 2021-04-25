@@ -1,6 +1,6 @@
 import 'phaser';
 import { MenuScene } from './menu-scene';
-import { DigScene }  from './dig-scene';
+import { DigScene } from './dig-scene';
 import { globalDebug } from './utils';
 
 const GameConfig: Phaser.Types.Core.GameConfig = {
@@ -49,7 +49,7 @@ declare global {
   //   Property '_game' does not exist on type 'Window & typeof globalThis'.
   // https://stackoverflow.com/questions/12709074/how-do-you-explicitly-set-a-new-property-on-window-in-typescript
   interface Window {
-      _game: Phaser.Game;
+    _game: Phaser.Game;
   }
 }
 

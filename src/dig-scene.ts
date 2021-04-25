@@ -29,11 +29,16 @@ export class DigScene extends Phaser.Scene {
   private marker!: Phaser.GameObjects.Graphics;
   private groundLayer!: Phaser.Tilemaps.TilemapLayer;
   private player!: Player;
+  private level = 1;
 
   constructor() {
     super({
       key: 'DigScene'
     });
+  }
+
+  init(props: any) {
+    this.level = props.level || 1;
   }
 
   preload(): void {
@@ -64,7 +69,7 @@ export class DigScene extends Phaser.Scene {
     this.marker.strokeRect(0, 0, map.tileWidth, map.tileHeight);
   }
 
-  generatePoopMap() {
+  generatePoopMap(baseWidth: number) {
     // Example poop piles
     //   *
     //  ***
@@ -80,16 +85,16 @@ export class DigScene extends Phaser.Scene {
     //  ***
     //*****
     //
-    const baseWidth = 10;
-    const startX = 0;
-    const startY = 0;
     const stepX = 100;
-    const stepY = 100;
+    const stepY = 80;
+    const startX = stepX + 20;
+    const startY = -stepY;
     const fuzzX = stepX / 8;
     const fuzzY = stepY / 8;
     let width = baseWidth;
     let height = 0;
     let offset = 0;
+    const poopImages = [];
     while (width > 0) {
       for (let i = 0; i < width; i++) {
         const imageX = startX + i * stepX + Math.random() * fuzzX + offset * stepX;
@@ -97,6 +102,7 @@ export class DigScene extends Phaser.Scene {
         const image = this.add.image(imageX, imageY, 'poopFalafel');
         image.tint = randomBrown();
         image.scale = getRandomArbitrary(0.9, 1.1);
+        poopImages.push(image);
       }
 
       width -= 1;
@@ -108,6 +114,26 @@ export class DigScene extends Phaser.Scene {
         offset = offset + getRandomInt(-1, 1);
       }
     }
+
+    // Hide Bob in a poop falafel
+    let bobIndex = getRandomInt(0, poopImages.length - 1);
+    if (poopImages.length > 1 && bobIndex == 0) {
+      // Can't have Bob hide right at the start.
+      bobIndex = 1;
+    }
+    console.log("physics overalp", this.player, poopImages[bobIndex]);
+    this.physics.add.existing(poopImages[bobIndex]);
+    this.physics.add.overlap(this.player, poopImages[bobIndex], this.foundBob, undefined, this);
+  }
+
+  // foundBob(player: Player, poopImage: Phaser.GameObjects.Image) {
+  foundBob(player: any, poopImage: any) {
+    if (player.isAlive) {
+      console.log("Found bob!", player, poopImage);
+      poopImage.scale = 2;
+      this.scene.restart({ level: this.level + 1 });
+    }
+    player.isAlive = false;
   }
 
   create(): void {
@@ -118,31 +144,24 @@ export class DigScene extends Phaser.Scene {
     // Limit the camera to the map size
     // this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
-    this.add.text(0, 0, 'Press S to restart', {
+    this.player = new Player(this, 0, 0);
+
+    this.add.image(100, 100, 'particle');
+    this.generatePoopMap(this.level + 1);
+
+    const instructions = this.add.text(-100, 0, 'Tap/click to start', {
       fontSize: '60px',
       fontFamily: "Helvetica",
     });
 
-    this.add.image(100, 100, 'particle');
-    this.generatePoopMap();
-
-    // for (let i = 0; i < 300; i++) {
-    //   const x = Phaser.Math.Between(-64, 800);
-    //   const y = Phaser.Math.Between(-64, 600);
-
-    //   const image = this.add.image(x, y, 'particle');
-    //   image.setBlendMode(Phaser.BlendModes.NORMAL);
-    //   this.sprites.push({ s: image, r: 2 + Math.random() * 6 });
-    // }
+    const status = this.add.text(10, 10, 'Level ' + this.level, {
+      fontSize: '30px',
+      fontFamily: "Helvetica",
+    }).setScrollFactor(0);
 
     this.input.once('pointerup', (_pointer: Phaser.Input.Pointer) => {
-      // var touchX = pointer.x;
-      // var touchY = pointer.y;
-      // ...
-      // this.sound.add('overture', { loop: false }).play();
-      // this.scene.start(this);
-      
       this.player.start();
+      instructions.setVisible(false);
     });
   
     if (globalDebug) {
@@ -151,7 +170,8 @@ export class DigScene extends Phaser.Scene {
         .lineStyle(3, 0xdddd78, 1)
         .strokeRect(0, 0, this.physics.world.bounds.width, this.physics.world.bounds.height);
     }
-    this.player = new Player(this, 0, 0);
+
+    this.player.depth = 1;
   }
 
   update(): void {
