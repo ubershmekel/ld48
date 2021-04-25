@@ -13,6 +13,7 @@ import Player from './player';
 import { getRandomArbitrary, getRandomInt, globalDebug, sleep, tweenPromise } from './utils';
 import { playDistance, playWinSound } from './sounds';
 import { DialogBox } from './dialog-box';
+import { storyLines } from './text';
 
 const brownColors = [
   0x513015,
@@ -67,7 +68,6 @@ export class DigScene extends Phaser.Scene {
     this.load.tilemapTiledJSON('map', tileMapDataUrl);
     this.load.image("ground", groundUrl);
     this.load.image("elephant", elephantUrl);
-
   }
 
   createMap() {
@@ -137,11 +137,11 @@ export class DigScene extends Phaser.Scene {
     this.bobTarget = poopImages[bobIndex];
     this.startDistance = Phaser.Math.Distance.BetweenPoints(this.player, this.bobTarget);
     this.physics.add.existing(this.bobTarget);
-    this.physics.add.overlap(this.player, this.bobTarget, this.foundBob, undefined, this);
+    this.physics.add.overlap(this.player, this.bobTarget, this.levelEnd, undefined, this);
   }
 
   // foundBob(player: Player, poopImage: Phaser.GameObjects.Image) {
-  async foundBob(playerTypeLess: any, poopImageTypeLess: any) {
+  async levelEnd(playerTypeLess: any, poopImageTypeLess: any) {
     const player = playerTypeLess as Player;
     const poopImage = poopImageTypeLess as Phaser.GameObjects.Image;
     if (!player.isAlive) {
@@ -149,6 +149,12 @@ export class DigScene extends Phaser.Scene {
     }
 
     // Now celebrate and go to the next level
+    const storyLineIndex = this.level - 1;
+    let textPromise = null;
+    if (storyLineIndex < storyLines.length) {
+      textPromise = this.dialog.setText(storyLines[this.level - 1][0])
+      this.dialog.show();
+    }
 
     player.isAlive = false;
     console.log("Found bob!", player, poopImage);
@@ -168,21 +174,27 @@ export class DigScene extends Phaser.Scene {
 
     const bob = this.add.image(poopImage.x, poopImage.y, 'foundBob');
     bob.alpha = 0;
+    // `bob.depth` so Bob shows up above the poop and the player
+    bob.depth = 3;
     tweenPromise(this, {
       targets: bob,
       duration: 300,
       alpha: 1,
     });
-    tweenPromise(this, {
+    await tweenPromise(this, {
       targets: bob,
       duration: 600,
       y: '+=40',
       ease: 'Bounce.easeOut',
     });
-    // Bob should show up above the poop and the player
-    bob.depth = 3;
 
-    await sleep(2000);
+    if (textPromise) {
+      await textPromise;
+      await sleep(1000);
+      this.dialog.moveToTop();
+      await this.dialog.setText(storyLines[this.level - 1][1]);
+    }
+    await sleep(1500);
 
     this.scene.restart({ level: this.level + 1 });
   }
@@ -203,9 +215,12 @@ export class DigScene extends Phaser.Scene {
 
   create(): void {
     this.createBackground();
+    this.dialog = new DialogBox(this);
     if (this.level === 1) {
-      this.dialog = new DialogBox(this);
       this.dialog.setText("I can't believe Bob got lost in the poop. Conveniently, the piano 🎹 plays a higher note ♯🎵 when I get closer to Bob 🐜.");
+      this.dialog.moveToBottom();
+    } else {
+      this.dialog.hide();
     }
 
     // this.physics.world.setBounds(0, 0, 1e4, 1e4);

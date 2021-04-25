@@ -1,8 +1,8 @@
 
 
-const storyLines = [
-  ['There you are, Bob!', 'Fewf, that was a close one'],
-  ['What is it, do you like the smell?', "Nope, I just like the elephants"],
+export const storyLines = [
+  ['There you are, Bob!', 'Fewf, that was a close one.'],
+  ['What is it, do you like the smell?', "Nope, I just like the elephants."],
   ['Why do you keep getting in deeper and deeper sh-', "It's only game, why you heff to be mad?"],
   ['Mom is going to be worried', 'Crap! We should go home.'],
   ["That's it! We're going home right now!", "Yeah, I'm all pooped out."],
@@ -12,5 +12,6 @@ const storyLines = [
   ["What kind of webapp do you make in the toilet?", "CRUD!"],
   ["Is diarrhea hereditary?", "It does run in jeans..."],
   ["Bob, what's a palindrome?", "It's like poop..."],
-  ["This is the end of the game", "Congratulations! You can keep going if you like."],
+  ['This is the "end" of the game', "Congratulations! You can keep going if you like..."],
+  ["Can I ask for a favor?", "Could you leave a comment on the Ludum Dare page with which level you made it to?"],
 ];
