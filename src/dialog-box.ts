@@ -11,6 +11,7 @@ export class DialogBox {
   scene: Phaser.Scene;
   sceneText: Phaser.GameObjects.Text;
   graphics: Phaser.GameObjects.Graphics;
+  targetText = '';
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -34,6 +35,7 @@ export class DialogBox {
     graphics.setScrollFactor(0);
 
     // Make text
+    this.targetText = '';
     const sceneText = scene.make.text({
       x: margin + padding,
       y: boxY + padding,
@@ -71,16 +73,29 @@ export class DialogBox {
   setText(text: string): Promise<void> {
     // Slowly display the text in the window
     const sceneText = this.sceneText;
+    this.targetText = text;
     sceneText.setText('');
     return new Promise<void>((resolve) => {
+      const done = () => {
+        timedEvent.remove();
+        resolve();
+      }
+
       const animateText = () => {
         const nextIndex = sceneText.text.length;
-        if (nextIndex >= text.length) {
-          timedEvent.remove();
-          resolve();
-        } else {
-          sceneText.setText(sceneText.text + text[nextIndex]);
+        if (this.targetText !== text) {
+          // I might fix this bug later.
+          console.log("DUPLICATE DIALOG SET TEXT NO BUENO", text, this.targetText);
+          done();
+          return;
         }
+        if (nextIndex >= text.length) {
+          done();
+          return;
+        }
+
+        sceneText.setText(sceneText.text + text[nextIndex]);
+
       }
       const timedEvent = this.scene.time.addEvent({
         delay: 10,
