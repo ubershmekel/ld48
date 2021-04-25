@@ -36,7 +36,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     // https://phaser.discourse.group/t/solved-animation-on-extends-sprites-class/3035
     super.preUpdate(time, delta);
 
-    this.distanceMoved += Phaser.Math.Distance.BetweenPoints(this, {x: this.lastX, y: this.lastY});
+    const thisStepDistance = Phaser.Math.Distance.BetweenPoints(this, {x: this.lastX, y: this.lastY});
+    if (thisStepDistance > 0) {
+      this.anims.play("player-run", true);
+    } else {
+      this.anims.play("player-idle", true);
+    }
+    this.distanceMoved += thisStepDistance;
     this.lastX = this.x;
     this.lastY = this.y;
     if (this.isAlive) {

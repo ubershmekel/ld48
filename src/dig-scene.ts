@@ -106,14 +106,14 @@ export class DigScene extends Phaser.Scene {
     const anims = this.anims;
     anims.create({
       key: "player-idle",
-      frames: anims.generateFrameNumbers("player", { start: 0, end: 2 }),
+      frames: anims.generateFrameNumbers("player", { start: 4, end: 7 }),
       frameRate: 3,
       repeat: -1
     });
     anims.create({
       key: "player-run",
-      frames: anims.generateFrameNumbers("player", { start: 2, end: 4 }),
-      frameRate: 12,
+      frames: anims.generateFrameNumbers("player", { start: 8, end: 9 }),
+      frameRate: 8,
       repeat: -1
     });
   }
@@ -175,6 +175,7 @@ export class DigScene extends Phaser.Scene {
     this.physics.add.existing(this.bobTarget);
     this.physics.add.overlap(this.player, this.bobTarget, this.levelEnd, undefined, this);
     this.poopRegion = this.getBoundingRect(poopImages);
+    console.log("poop region", this.poopRegion);
   }
 
   getBoundingRect(items: any[]): Rect {
@@ -270,12 +271,9 @@ export class DigScene extends Phaser.Scene {
     elephant.scale = 2;
   }
 
-  testSprite: any;
   create(): void {
     this.createBackground();
     this.createAnims();
-
-    this.testSprite = this.physics.add.sprite(50,50, "player", 0);
 
     this.dialog = new DialogBox(this);
     if (this.level === 1) {
@@ -376,9 +374,6 @@ export class DigScene extends Phaser.Scene {
   }
 
   update(): void {
-    this.player.anims.play("player-idle", true);
-    this.testSprite.anims.play("player-idle", true);
-
     this.maybeShowHelpDialog();
 
     this.updateTrail();
