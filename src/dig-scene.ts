@@ -4,6 +4,7 @@ import soundUrl from '../assets/audio/test.mp3';
 import tileMapUrl from '../assets/images/tilemap.png';
 import groundUrl from '../assets/images/ground.png';
 import elephantUrl from '../assets/images/elephant.png';
+import digTrailUrl from '../assets/images/digTrail.png';
 import flyUrl from '../assets/images/fly.png';
 import poopFalafelUrl from '../assets/images/poopFalafel.png';
 import antTopUrl from '../assets/images/ant-top.png';
@@ -43,6 +44,8 @@ export class DigScene extends Phaser.Scene {
   private dialog!: DialogBox;
   private helpTipSeen = false;
   private distanceUpdatesCount = 0;
+  private trail!: Phaser.GameObjects.Image[];
+  private poopRegion!: Rect;
 
   constructor() {
     super({
@@ -65,6 +68,7 @@ export class DigScene extends Phaser.Scene {
 
     this.load.image("tiles", tileMapUrl);
     this.load.image("fly", flyUrl);
+    this.load.image("digTrail", digTrailUrl);
     this.load.image("foundBob", foundBobUrl);
     this.load.image("poopFalafel", poopFalafelUrl);
     this.load.image("ant-top", antTopUrl);
@@ -141,6 +145,26 @@ export class DigScene extends Phaser.Scene {
     this.startDistance = Phaser.Math.Distance.BetweenPoints(this.player, this.bobTarget);
     this.physics.add.existing(this.bobTarget);
     this.physics.add.overlap(this.player, this.bobTarget, this.levelEnd, undefined, this);
+    this.poopRegion = this.getBoundingRect(poopImages);
+  }
+
+  getBoundingRect(items: any[]): Rect {
+    let minX = items[0].x;
+    let minY = items[0].y;
+    let maxX = minX;
+    let maxY = minY;
+    for (const im of items) {
+      minX = Math.min(im.x, minX);
+      minY = Math.min(im.y, minY);
+      maxX = Math.max(im.x, maxX);
+      maxY = Math.max(im.y, maxY);
+    }
+    return {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+    }
   }
 
   // foundBob(player: Player, poopImage: Phaser.GameObjects.Image) {
@@ -218,6 +242,7 @@ export class DigScene extends Phaser.Scene {
 
   create(): void {
     this.createBackground();
+
     this.dialog = new DialogBox(this);
     if (this.level === 1) {
       this.dialog.setText("I can't believe Bob got lost in the poop. Conveniently, the piano 🎹 plays a higher note ♯🎵 when I get closer to Bob 🐜.");
@@ -264,6 +289,8 @@ export class DigScene extends Phaser.Scene {
     // we need the player during poop calculations.
     this.player.depth = 2;
     this.cameras.main.startFollow(this.player);
+
+    this.createTrailFollowPlayer();
   }
 
   start() {
@@ -292,8 +319,32 @@ export class DigScene extends Phaser.Scene {
     }
   }
 
+  createTrailFollowPlayer() {
+    this.trail = [];
+    this.lastDistance = 0;
+    for (let i = 0; i < 10; i++) {
+      const image = this.add.image(-2000, -2000, 'digTrail');
+      image.scale = 0.5;
+      image.setBlendMode(Phaser.BlendModes.MULTIPLY);
+      this.trail.push(image);
+    }
+  }
+
+  lastDistance = 0;
+  updateTrail() {
+    if (this.player.distanceMoved - this.lastDistance > 10) {
+      this.lastDistance = this.player.distanceMoved;
+      const lastTrail = this.trail.shift()!;
+      lastTrail.x = this.player.x;
+      lastTrail.y = this.player.y;
+      this.trail.push(lastTrail);
+    }
+  }
+
   update(): void {
     this.maybeShowHelpDialog();
+
+    this.updateTrail();
 
     const msBetweenChords = 3000;
     if (this.player.isAlive) {
@@ -325,4 +376,11 @@ export class DigScene extends Phaser.Scene {
       this.marker.setPosition(snappedWorldPoint.x, snappedWorldPoint.y);
     }
   }
+}
+
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
