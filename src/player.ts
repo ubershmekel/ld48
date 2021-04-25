@@ -68,7 +68,7 @@ export default class Player extends Phaser.Physics.Arcade.Image {
 
   start() {
     this.isAlive = true;
-    this.scene.input.on('pointermove', (_pointer: Phaser.Input.Pointer) => {
+    // this.scene.input.on('pointermove', (_pointer: Phaser.Input.Pointer) => {
       // const preRotation = this.rotation;
       // if (this.isAlive) {
       //   this.target.x = pointer.x;
@@ -80,7 +80,7 @@ export default class Player extends Phaser.Physics.Arcade.Image {
       //   console.log(this.body.x, this.body.y)
 
       // }
-    });
+    // });
   }
 
   preUpdate() {
@@ -98,7 +98,7 @@ export default class Player extends Phaser.Physics.Arcade.Image {
 
     }
 
-    if (Phaser.Math.Distance.Between(this.x, this.y, this.target.x, this.target.y) < 20) {
+    if (!this.isAlive || Phaser.Math.Distance.Between(this.x, this.y, this.target.x, this.target.y) < 20) {
       // this.body.reset(this.target.x, this.target.y);
       this.body.reset(this.x, this.y);
     }

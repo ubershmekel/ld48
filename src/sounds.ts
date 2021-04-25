@@ -1,5 +1,6 @@
 import * as Tone from 'tone'
 import { Piano } from '@tonejs/piano'
+import { sleep } from './utils';
 
 // const synth = new Tone.Synth().toDestination();
 const reverb = new Tone.Reverb({
@@ -34,9 +35,9 @@ function chordStrSplit(text: string) {
   return text.match(/.{2}/g) || [];
 }
 
-function sleep(ms: number) {
-  // https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
-  return new Promise(resolve => setTimeout(resolve, ms));
+export function playWinSound() {
+  Tone.Transport.stop(); // note this doesn't really work
+  return playNotes('C3E5G5C5', noteDurationSeconds * 2);
 }
 
 async function playNotes(notesStr: string, durationSeconds: number) {

@@ -7,10 +7,11 @@ import elephantUrl from '../assets/images/elephant.png';
 import flyUrl from '../assets/images/fly.png';
 import poopFalafelUrl from '../assets/images/poopFalafel.png';
 import antTopUrl from '../assets/images/ant-top.png';
+import foundBobUrl from '../assets/images/foundBob.png';
 import tileMapDataUrl from '../assets/images/bob-map.json';
 import Player from './player';
-import { getRandomArbitrary, getRandomInt, globalDebug } from './utils';
-import { playDistance } from './sounds';
+import { getRandomArbitrary, getRandomInt, globalDebug, sleep, tweenPromise } from './utils';
+import { playDistance, playWinSound } from './sounds';
 import { DialogBox } from './dialog-box';
 
 const brownColors = [
@@ -60,6 +61,7 @@ export class DigScene extends Phaser.Scene {
 
     this.load.image("tiles", tileMapUrl);
     this.load.image("fly", flyUrl);
+    this.load.image("foundBob", foundBobUrl);
     this.load.image("poopFalafel", poopFalafelUrl);
     this.load.image("ant-top", antTopUrl);
     this.load.tilemapTiledJSON('map', tileMapDataUrl);
@@ -139,13 +141,50 @@ export class DigScene extends Phaser.Scene {
   }
 
   // foundBob(player: Player, poopImage: Phaser.GameObjects.Image) {
-  foundBob(player: any, poopImage: any) {
-    if (player.isAlive) {
-      console.log("Found bob!", player, poopImage);
-      poopImage.scale = 2;
-      this.scene.restart({ level: this.level + 1 });
+  async foundBob(playerTypeLess: any, poopImageTypeLess: any) {
+    const player = playerTypeLess as Player;
+    const poopImage = poopImageTypeLess as Phaser.GameObjects.Image;
+    if (!player.isAlive) {
+      return;
     }
+
+    // Now celebrate and go to the next level
+
     player.isAlive = false;
+    console.log("Found bob!", player, poopImage);
+    playWinSound();
+
+    // poopImage.scale = 1.2;
+    tweenPromise(this, {
+      targets: poopImage,
+      scale: 1.3,
+      // ease: 'Linear',
+      duration: 300,
+    });
+
+    await sleep(100);
+    // bring the poop to the front
+    poopImage.depth = 1;
+
+    const bob = this.add.image(poopImage.x, poopImage.y, 'foundBob');
+    bob.alpha = 0;
+    tweenPromise(this, {
+      targets: bob,
+      duration: 300,
+      alpha: 1,
+    });
+    tweenPromise(this, {
+      targets: bob,
+      duration: 600,
+      y: '+=40',
+      ease: 'Bounce.easeOut',
+    });
+    // Bob should show up above the poop and the player
+    bob.depth = 3;
+
+    await sleep(2000);
+
+    this.scene.restart({ level: this.level + 1 });
   }
 
   createBackground() {
@@ -194,7 +233,7 @@ export class DigScene extends Phaser.Scene {
     this.input.once('pointerup', (_pointer: Phaser.Input.Pointer) => {
       this.start();
     });
-  
+
     if (globalDebug) {
       // World bounds rectangle for debug
       this.add.graphics()
@@ -205,7 +244,7 @@ export class DigScene extends Phaser.Scene {
     // Make sure the player is rendered above the poop.
     // Note we must initialize the player before the poop because
     // we need the player during poop calculations.
-    this.player.depth = 1;
+    this.player.depth = 2;
   }
 
   start() {
@@ -250,7 +289,7 @@ export class DigScene extends Phaser.Scene {
       const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
       const pointerTileXY = this.groundLayer.worldToTileXY(worldPoint.x, worldPoint.y);
       const snappedWorldPoint = this.groundLayer.tileToWorldXY(pointerTileXY.x, pointerTileXY.y);
-      this.marker.setPosition(snappedWorldPoint.x, snappedWorldPoint.y);  
+      this.marker.setPosition(snappedWorldPoint.x, snappedWorldPoint.y);
     }
   }
 }
