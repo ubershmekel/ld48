@@ -6,7 +6,8 @@ import flyUrl from '../assets/images/fly.png';
 import antTopUrl from '../assets/images/ant-top.png';
 import tileMapDataUrl from '../assets/images/bob-map.json';
 import splashScreenUrl from '../assets/images/splashScreen.png';
-import { welcomeSound } from './sounds';
+import pianoLessUrl from '../assets/audio/piano-less.mp3';
+import { soundMarkers } from './new-sounds';
 
 export class MenuScene extends Phaser.Scene {
   private startKey!: Phaser.Input.Keyboard.Key;
@@ -31,6 +32,8 @@ export class MenuScene extends Phaser.Scene {
     this.load.image("ant-top", antTopUrl);
     this.load.image("splashScreen", splashScreenUrl);
     this.load.tilemapTiledJSON('map', tileMapDataUrl);
+
+    this.load.audio('piano', pianoLessUrl);
   }
 
   create(): void {
@@ -64,7 +67,8 @@ export class MenuScene extends Phaser.Scene {
   }
 
   exitMenu() {
-    welcomeSound();
+    // welcomeSound();
+    this.sound.play('piano', soundMarkers[0]);
     this.scene.start('DigScene');
   }
 
