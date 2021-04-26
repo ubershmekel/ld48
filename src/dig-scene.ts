@@ -42,7 +42,8 @@ export class DigScene extends Phaser.Scene {
   private bobTarget!: Phaser.GameObjects.Image;
   private startDistance = 1e9;
   private dialog!: DialogBox;
-  private helpTipSeen = false;
+  private distanceHelpTipSeen = false;
+  private timeHelpTipSeen = false;
   private distanceUpdatesCount = 0;
   private trail!: Phaser.GameObjects.Image[];
   private poopRegion!: Rect;
@@ -352,12 +353,18 @@ export class DigScene extends Phaser.Scene {
 
   maybeShowHelpDialog() {
     const dist = Phaser.Math.Distance.BetweenPoints(this.player, this.bobTarget);
-    const notWinning = this.distanceUpdatesCount > 8 || dist > 1000;
-    if (notWinning && this.level < 8 && !this.helpTipSeen) {
-      console.log("You need some help");
+    if (dist > 1000 && this.level < 8 && !this.distanceHelpTipSeen) {
+      console.log("You need some distance help");
       this.dialog.setText("You're pretty far off... Go find Bob 🐜 in the poop 💩!");
       this.dialog.show();
-      this.helpTipSeen = true;
+      this.distanceHelpTipSeen = true;
+    }
+
+    if (this.distanceUpdatesCount > 8 && this.level < 8 && !this.timeHelpTipSeen) {
+      console.log("You need some piano help");
+      this.dialog.setText("The piano 🎹 plays a higher note when you're close.");
+      this.dialog.show();
+      this.timeHelpTipSeen = true;
     }
   }
 
