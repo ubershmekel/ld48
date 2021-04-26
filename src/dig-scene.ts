@@ -10,9 +10,11 @@ import poopFalafelUrl from '../assets/images/poopFalafel.png';
 import antTopUrl from '../assets/images/ant-top.png';
 import foundBobUrl from '../assets/images/foundBob.png';
 import tileMapDataUrl from '../assets/images/bob-map.json';
+import pianoLessUrl from '../assets/audio/piano-less.mp3';
 import Player from './player';
 import { getRandomArbitrary, getRandomInt, globalDebug, sleep, tweenPromise } from './utils';
-import { playDistance, playWinSound } from './sounds';
+// import { playDistance } from './sounds';
+import { soundMarkers } from './new-sounds';
 import { DialogBox } from './dialog-box';
 import { storyLines } from './text';
 
@@ -78,6 +80,8 @@ export class DigScene extends Phaser.Scene {
     this.load.tilemapTiledJSON('map', tileMapDataUrl);
     this.load.image("ground", groundUrl);
     this.load.image("elephant", elephantUrl);
+
+    this.load.audio('piano', pianoLessUrl);
 
     this.load.spritesheet(
       "sprite-sheet",
@@ -224,7 +228,8 @@ export class DigScene extends Phaser.Scene {
 
     player.isAlive = false;
     console.log("Found bob!", player, poopImage);
-    playWinSound();
+    // playWinSound();
+    this.sound.play('piano', soundMarkers[soundMarkers.length - 1]);
 
     // poopImage.scale = 1.2;
     tweenPromise(this, {
@@ -348,7 +353,24 @@ export class DigScene extends Phaser.Scene {
     this.lastDistanceUpdateTime = new Date().getTime();
     const dist = Phaser.Math.Distance.BetweenPoints(this.player, this.bobTarget);
     const relativeToStart = dist / this.startDistance;
-    playDistance(relativeToStart);
+    this.playDistance(relativeToStart);
+  }
+
+  playDistance(distance: number) {
+    // `distance` is 0.0 is closest
+    // 1.0 or greater is farther
+    if (distance > 0.99) {
+      // avoid out of bounds array index
+      distance = 0.99;
+    }
+    if (distance < 0.0) {
+      distance = 0.0;
+    }
+    // Math.floor(chords.length * distance) === [0, chords.length - 1]
+    // chordIndex === [0, chords.length - 1], but the larger the distance, the lower the index
+    const chordIndex = soundMarkers.length - Math.floor(soundMarkers.length * distance) - 1;
+    this.sound.play('piano', soundMarkers[chordIndex]);
+    // return playNotes(chords[chordIndex], noteDurationSeconds);
   }
 
   maybeShowHelpDialog() {
