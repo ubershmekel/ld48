@@ -12,6 +12,8 @@ export class DialogBox {
   sceneText: Phaser.GameObjects.Text;
   graphics: Phaser.GameObjects.Graphics;
   targetText = '';
+  resolver: VoidFunction | null = null;
+  promise: Promise<void> | null = null;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -71,26 +73,29 @@ export class DialogBox {
   }
 
   setText(text: string): Promise<void> {
-    // Slowly display the text in the window
+    // Slowly display the text in the dialog box
     const sceneText = this.sceneText;
     this.targetText = text;
     sceneText.setText('');
-    return new Promise<void>((resolve) => {
-      const done = () => {
+    this.promise = new Promise<void>((resolve) => {
+      this.resolver = resolve;
+      const doneAnimating = () => {
         timedEvent.remove();
-        resolve();
       }
 
       const animateText = () => {
         const nextIndex = sceneText.text.length;
         if (this.targetText !== text) {
+          // In an async situation where someone called setText
+          // and then setText again while this `animateText` is still happening
+          // then this.targetText and `text` will be out of sync and corrupt the dialog.
           // I might fix this bug later.
           console.log("DUPLICATE DIALOG SET TEXT NO BUENO", text, this.targetText);
-          done();
+          doneAnimating();
           return;
         }
         if (nextIndex >= text.length) {
-          done();
+          doneAnimating();
           return;
         }
 
@@ -104,6 +109,31 @@ export class DialogBox {
       });
     });
 
+    return this.promise;
+  }
+
+  skipClick(): Promise<void> {
+    if (this.targetText === this.sceneText.text) {
+      // dismiss
+      if (this.resolver) {
+        this.resolver();
+      }
+      this.resolver = null;
+    } else {
+      // finish typing it out
+      this.sceneText.setText(this.targetText);
+    }
+
+    if (this.promise) {
+      return this.promise;
+    } else {
+      // No dialog presented yet. Pretend we dismissed it already.
+      return Promise.resolve();
+    }
+  }
+
+  isVisible() {
+    return this.graphics.visible;
   }
 
   hide() {

@@ -46,6 +46,7 @@ export class DigScene extends Phaser.Scene {
   private distanceUpdatesCount = 0;
   private trail!: Phaser.GameObjects.Image[];
   private poopRegion!: Rect;
+  private started = false;
 
   constructor() {
     super({
@@ -56,6 +57,7 @@ export class DigScene extends Phaser.Scene {
   init(props: any) {
     this.level = props.level || 1;
     this.distanceUpdatesCount = 0;
+    this.started = false;
   }
 
   preload(): void {
@@ -231,7 +233,7 @@ export class DigScene extends Phaser.Scene {
       duration: 300,
     });
 
-    await sleep(100);
+    await sleep(200);
     // bring the poop to the front
     poopImage.depth = 1;
 
@@ -254,11 +256,9 @@ export class DigScene extends Phaser.Scene {
 
     if (textPromise) {
       await textPromise;
-      await sleep(1000);
       this.dialog.moveToTop();
       await this.dialog.setText(storyLines[this.level - 1][1]);
     }
-    await sleep(1500);
 
     this.scene.restart({ level: this.level + 1 });
   }
@@ -278,6 +278,20 @@ export class DigScene extends Phaser.Scene {
     elephant.scale = 2;
   }
 
+  createUIText() {
+    this.instructions = this.add.text(-100, 0, 'Tap/click to start', {
+      fontSize: '60px',
+      fontFamily: "Helvetica",
+    });
+
+    const status = this.add.text(10, 10, 'Level ' + this.level, {
+      fontSize: '30px',
+      fontFamily: "Helvetica",
+    });
+    // The status should not scroll when the camera moves
+    status.setScrollFactor(0);
+  }
+
   create(): void {
     this.createBackground();
     this.createAnims();
@@ -290,30 +304,18 @@ export class DigScene extends Phaser.Scene {
       this.dialog.hide();
     }
 
-    // this.physics.world.setBounds(0, 0, 1e4, 1e4);
-    // console.log("world", this.physics.world.bounds);
-    // Limit the camera to the map size
-    // this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-
     this.player = new Player(this, 0, 0);
 
     this.add.image(100, 100, 'particle');
     this.generatePoopMap(this.level + 5);
 
-    this.instructions = this.add.text(-100, 0, 'Tap/click to start', {
-      fontSize: '60px',
-      fontFamily: "Helvetica",
-    });
+    this.createUIText();
 
-    const status = this.add.text(10, 10, 'Level ' + this.level, {
-      fontSize: '30px',
-      fontFamily: "Helvetica",
-    });
-    // The status should not scroll when the camera moves
-    status.setScrollFactor(0);
-
-    this.input.once('pointerup', (_pointer: Phaser.Input.Pointer) => {
-      this.start();
+    this.input.on('pointerup', async () => {
+      await this.dialog.skipClick();
+      if (!this.started) {
+        this.start();
+      }
     });
 
     if (globalDebug) {
@@ -333,6 +335,7 @@ export class DigScene extends Phaser.Scene {
   }
 
   start() {
+    this.started = true;
     this.player.start();
     this.instructions.setVisible(false);
     this.giveDistanceUpdate();
